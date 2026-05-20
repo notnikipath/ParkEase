@@ -1,4 +1,4 @@
-﻿# Task_26_ParkEase
+﻿# ParkEase
 
 ParkEase - microservice platform for smart parking search, reservation, payment, and navigation.
 
@@ -69,7 +69,7 @@ parkease/
 ## Local Run
 
 ```bash
-cd d:\Шарага\Кинжа10\Task_26_ParkEase
+cd 'your/project/folder'
 docker compose up --build -d
 ```
 
