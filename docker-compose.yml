@@ -1,0 +1,190 @@
+﻿services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: parkease-api-gateway
+    env_file: .env
+    ports:
+      - "32047:8400"
+    depends_on:
+      - booking-service
+      - navigation-service
+      - sensor-service
+      - owner-service
+      - map-service
+      - analytics-service
+      - notification-service
+      - payment-service
+    networks: [parkease-net]
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: booking-service/Dockerfile
+    container_name: parkease-booking
+    env_file: .env
+    ports:
+      - "32048:8401"
+    depends_on:
+      - postgres
+      - redis
+    networks: [parkease-net]
+
+  navigation-service:
+    build:
+      context: .
+      dockerfile: navigation-service/Dockerfile
+    container_name: parkease-navigation
+    env_file: .env
+    ports:
+      - "32049:8402"
+    depends_on:
+      - redis
+    networks: [parkease-net]
+
+  sensor-service:
+    build:
+      context: .
+      dockerfile: sensor-service/Dockerfile
+    container_name: parkease-sensor
+    env_file: .env
+    ports:
+      - "32050:8403"
+    depends_on:
+      - timescaledb
+      - redis
+      - rabbitmq
+      - mosquitto
+    networks: [parkease-net]
+
+  owner-service:
+    build:
+      context: .
+      dockerfile: owner-service/Dockerfile
+    container_name: parkease-owner
+    env_file: .env
+    ports:
+      - "32051:8404"
+    depends_on:
+      - postgres
+    networks: [parkease-net]
+
+  map-service:
+    build:
+      context: .
+      dockerfile: map-service/Dockerfile
+    container_name: parkease-map
+    env_file: .env
+    ports:
+      - "32052:8405"
+    depends_on:
+      - redis
+    networks: [parkease-net]
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: analytics-service/Dockerfile
+    container_name: parkease-analytics
+    env_file: .env
+    ports:
+      - "32053:8406"
+    depends_on:
+      - postgres
+      - timescaledb
+      - redis
+    networks: [parkease-net]
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: parkease-notification
+    env_file: .env
+    ports:
+      - "32054:8407"
+    depends_on:
+      - redis
+    networks: [parkease-net]
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: parkease-payment
+    env_file: .env
+    ports:
+      - "8408:8408"
+    depends_on:
+      - postgres
+      - redis
+    networks: [parkease-net]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: parkease-frontend
+    env_file: .env
+    ports:
+      - "32055:5177"
+    depends_on:
+      - api-gateway
+    networks: [parkease-net]
+
+  postgres:
+    image: postgres:16
+    container_name: parkease-postgres
+    environment:
+      POSTGRES_DB: parkease
+      POSTGRES_USER: parkease
+      POSTGRES_PASSWORD: parkease
+    ports:
+      - "32056:5432"
+    volumes:
+      - parkease_postgres_data:/var/lib/postgresql/data
+    networks: [parkease-net]
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: parkease-timescaledb
+    environment:
+      POSTGRES_DB: parkease
+      POSTGRES_USER: parkease
+      POSTGRES_PASSWORD: parkease
+    ports:
+      - "32057:5432"
+    volumes:
+      - parkease_timescaledb_data:/var/lib/postgresql/data
+    networks: [parkease-net]
+
+  redis:
+    image: redis:7
+    container_name: parkease-redis
+    ports:
+      - "32058:6379"
+    networks: [parkease-net]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: parkease-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks: [parkease-net]
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: parkease-mqtt
+    ports:
+      - "1883:1883"
+    networks: [parkease-net]
+
+networks:
+  parkease-net:
+    driver: bridge
+
+volumes:
+  parkease_postgres_data:
+  parkease_timescaledb_data:
