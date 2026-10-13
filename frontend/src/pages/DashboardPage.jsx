@@ -106,7 +106,7 @@ export function DashboardPage() {
       return "loading";
     }
     if (status === "failed") {
-      return "fallback";
+      return "Service unavailable";
     }
     return "live";
   }, [status]);
@@ -142,7 +142,7 @@ export function DashboardPage() {
       <header className="hero">
         <div className="hero-copy">
           <p className="eyebrow">ParkEase Smart Parking</p>
-          <h1>Find, reserve, pay, and navigate to parking spots in one real-time platform.</h1>
+          <h1>Parking overview</h1>
           <p className="sub">
             ParkEase combines map discovery, sensor occupancy, plate recognition, booking, payment, and owner analytics.
           </p>
@@ -160,13 +160,13 @@ export function DashboardPage() {
             <input value={parkingId} onChange={(event) => setParkingId(event.target.value)} placeholder="PARK-CENTER-01" />
           </label>
           <div className="hero-actions">
-            <button onClick={refresh}>Refresh dashboard</button>
+            <button onClick={refresh} disabled={status === "loading"}>Refresh dashboard</button>
             <button className="ghost" onClick={() => setTheme((current) => (current === "light" ? "dark" : "light"))}>
               Theme
             </button>
           </div>
           <button onClick={launchWorkflow}>Run find-and-book demo</button>
-          <p className="status-line">Status: {statusLabel}</p>
+          <p className="status-line" role="status" aria-live="polite">Status: {statusLabel}</p>
         </div>
       </header>
 
@@ -197,7 +197,7 @@ export function DashboardPage() {
         />
       </section>
 
-      {error ? <div className="error-banner">{error}</div> : null}
+      {error ? <div className="error-banner" role="alert">{error}</div> : null}
 
       <section className="content-grid">
         <article className="panel panel-featured">
